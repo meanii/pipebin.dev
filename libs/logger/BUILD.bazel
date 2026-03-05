@@ -1,0 +1,9 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "logger",
+    srcs = ["logger.go"],
+    importpath = "github.com/meanii/pipebin.dev/libs/logger",
+    visibility = ["//visibility:public"],
+    deps = ["@org_uber_go_zap//:zap"],
+)
