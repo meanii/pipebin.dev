@@ -8,6 +8,7 @@ go_library(
     deps = [
         "//libs/logger",
         "//services/api/internal/config",
+        "//services/api/internal/server",
         "@org_uber_go_zap//:zap",
     ],
 )

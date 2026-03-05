@@ -5,4 +5,8 @@ go_library(
     srcs = ["main.go"],
     importpath = "github.com/meanii/pipebin.dev/services/frontend/cmd",
     visibility = ["//visibility:public"],
+    deps = [
+        "//libs/logger",
+        "//services/frontend/internal/config",
+    ],
 )

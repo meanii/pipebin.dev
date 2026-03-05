@@ -1,8 +1,12 @@
 package main
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/meanii/pipebin.dev/libs/logger"
 	"github.com/meanii/pipebin.dev/services/api/internal/config"
+	"github.com/meanii/pipebin.dev/services/api/internal/server"
 	"go.uber.org/zap"
 )
 
@@ -10,5 +14,8 @@ func main() {
 	cfg := config.LoadConfig()
 	logger.SetupLogger(cfg.LOGGER)
 
-	zap.S().Info("config loaded.")
+	mux := server.NewRouter(server.Dependencies{})
+
+	zap.S().Infof("api.internal.pipebin.dev listening on http://0.0.0.0:%s", cfg.APP_PORT)
+	http.ListenAndServe(fmt.Sprintf(":%s", cfg.APP_PORT), mux)
 }
