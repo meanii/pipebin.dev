@@ -13,7 +13,8 @@ import (
 
 func main() {
 	cfg := config.LoadConfig()
-	logger.SetupLogger(cfg.LOGGER)
+	logger.Setup(cfg.LOGGER)
+	defer logger.Sync()
 
 	mux := server.NewRouter(server.Dependencies{})
 
