@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/meanii/pipebin.dev/libs/logger"
@@ -17,5 +18,5 @@ func main() {
 	mux := server.NewRouter(server.Dependencies{})
 
 	zap.S().Infof("api.internal.pipebin.dev listening on http://0.0.0.0:%s", cfg.APP_PORT)
-	http.ListenAndServe(fmt.Sprintf(":%s", cfg.APP_PORT), mux)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", cfg.APP_PORT), mux))
 }
