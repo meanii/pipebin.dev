@@ -3,7 +3,23 @@ package config
 import (
 	"log"
 	"os"
+	"path"
+
+	"github.com/joho/godotenv"
 )
+
+func LoadDotEnv(name, root string) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Fatal("Error failed to get CWD")
+	}
+
+	dotenvpath := path.Join(cwd, root, name)
+	err = godotenv.Load(dotenvpath)
+	if err != nil {
+		log.Fatal("Error loading .env file, ", dotenvpath)
+	}
+}
 
 // GetEnv get os.ENV, if not found return the fallback value
 func GetEnv(name string, defaultValue string) string {

@@ -1,0 +1,12 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "database",
+    srcs = ["db.go"],
+    importpath = "github.com/meanii/pipebin.dev/services/api/internal/database",
+    visibility = ["//services/api:__subpackages__"],
+    deps = [
+        "@io_gorm_driver_postgres//:postgres",
+        "@io_gorm_gorm//:gorm",
+    ],
+)

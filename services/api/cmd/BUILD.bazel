@@ -15,6 +15,7 @@ go_library(
 
 go_binary(
     name = "cmd",
+	data = ["//:configs/.env"],
     embed = [":cmd_lib"],
     visibility = ["//visibility:public"],
 )

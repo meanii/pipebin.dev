@@ -11,3 +11,5 @@ gazelle(
     ],
     command = "update-repos",
 )
+
+exports_files(["configs/.env"])
