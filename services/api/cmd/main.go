@@ -7,6 +7,7 @@ import (
 
 	"github.com/meanii/pipebin.dev/libs/logger"
 	"github.com/meanii/pipebin.dev/services/api/internal/config"
+	"github.com/meanii/pipebin.dev/services/api/internal/database"
 	"github.com/meanii/pipebin.dev/services/api/internal/server"
 	"go.uber.org/zap"
 )
@@ -15,6 +16,11 @@ func main() {
 	cfg := config.LoadConfig()
 	logger.Setup(cfg.LOGGER)
 	defer logger.Sync()
+
+	_, err := database.New(cfg.POSTGRESQL_DSN)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	mux := server.NewRouter(server.Dependencies{})
 

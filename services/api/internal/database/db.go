@@ -3,13 +3,16 @@ package database
 import (
 	"time"
 
+	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func New(dsn string) (*gorm.DB, error) {
 
+	zap.S().Infof("connecting to postgres %s", dsn)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	zap.S().Info("connected to postgres database")
 	if err != nil {
 		return nil, err
 	}

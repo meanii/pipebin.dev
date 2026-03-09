@@ -6,8 +6,6 @@ services:
       POSTGRES_USER: pipebin
       POSTGRES_PASSWORD: pipebin
       POSTGRES_DB: pipebin
-    volumes:
-      - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 10s

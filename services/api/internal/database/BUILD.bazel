@@ -8,5 +8,6 @@ go_library(
     deps = [
         "@io_gorm_driver_postgres//:postgres",
         "@io_gorm_gorm//:gorm",
+        "@org_uber_go_zap//:zap",
     ],
 )

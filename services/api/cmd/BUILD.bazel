@@ -8,6 +8,7 @@ go_library(
     deps = [
         "//libs/logger",
         "//services/api/internal/config",
+        "//services/api/internal/database",
         "//services/api/internal/server",
         "@org_uber_go_zap//:zap",
     ],
@@ -15,7 +16,7 @@ go_library(
 
 go_binary(
     name = "cmd",
-	data = ["//:configs/.env"],
+    data = ["//:configs/.env"],
     embed = [":cmd_lib"],
     visibility = ["//visibility:public"],
 )
