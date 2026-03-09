@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: pipebin
       POSTGRES_DB: pipebin
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: ["CMD-SHELL", "pg_isready -U pipebin -d pipebin"]
       interval: 10s
       timeout: 5s
       retries: 5

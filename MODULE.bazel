@@ -8,4 +8,4 @@ bazel_dep(name = "gazelle", version = "0.45.0")
 
 go_deps = use_extension("@gazelle//:extensions.bzl", "go_deps")
 go_deps.from_file(go_mod = "//:go.mod")
-use_repo(go_deps, "com_github_joho_godotenv", "io_gorm_driver_postgres", "io_gorm_gorm", "org_uber_go_zap")
+use_repo(go_deps, "com_github_google_uuid", "com_github_joho_godotenv", "com_github_matoous_go_nanoid_v2", "io_gorm_driver_postgres", "io_gorm_gorm", "org_uber_go_zap")

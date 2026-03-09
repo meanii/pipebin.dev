@@ -1,0 +1,12 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "models",
+    srcs = [
+        "paste.go",
+        "paste_input.go",
+    ],
+    importpath = "github.com/meanii/pipebin.dev/libs/models",
+    visibility = ["//visibility:public"],
+    deps = ["@com_github_google_uuid//:uuid"],
+)

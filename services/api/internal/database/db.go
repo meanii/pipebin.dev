@@ -3,6 +3,7 @@ package database
 import (
 	"time"
 
+	"github.com/meanii/pipebin.dev/services/api/cmd/repository"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -30,6 +31,9 @@ func New(dsn string) (*gorm.DB, error) {
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	// TODO: add auto migration
+	db.AutoMigrate(
+		repository.PasteModel{},
+	)
 
 	return db, nil
 }

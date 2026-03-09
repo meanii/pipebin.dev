@@ -1,0 +1,14 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "handler",
+    srcs = ["pastes_handler.go"],
+    importpath = "github.com/meanii/pipebin.dev/services/api/cmd/handler",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//libs/models",
+        "//services/api/internal/httpx",
+        "//services/api/internal/services",
+        "@org_uber_go_zap//:zap",
+    ],
+)

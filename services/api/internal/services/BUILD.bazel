@@ -1,0 +1,13 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "services",
+    srcs = ["pastes_services.go"],
+    importpath = "github.com/meanii/pipebin.dev/services/api/internal/services",
+    visibility = ["//services/api:__subpackages__"],
+    deps = [
+        "//libs/models",
+        "//services/api/cmd/repository",
+        "@com_github_matoous_go_nanoid_v2//:go-nanoid",
+    ],
+)

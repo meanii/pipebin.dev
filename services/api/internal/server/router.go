@@ -1,18 +1,20 @@
 package server
 
-import "net/http"
+import (
+	"net/http"
 
-type Dependencies struct{}
+	"github.com/meanii/pipebin.dev/services/api/cmd/handler"
+)
+
+type Dependencies struct {
+	PasteHandler handler.PasteHandler
+}
 
 func NewRouter(deps Dependencies) *http.ServeMux {
 	mux := http.NewServeMux()
 
-	// root endpoint (POST api.pipebin.dev)
-	mux.HandleFunc("POST /", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("X-Server", "api.internal.pipebin.dev")
-		w.WriteHeader(200)
-		w.Write([]byte("Created."))
-	})
+	// root endpoint (POST api.local.pipebin.dev)
+	mux.HandleFunc("POST /", deps.PasteHandler.CreatePaste)
 
 	return mux
 }
