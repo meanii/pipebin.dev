@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "repository",
     srcs = ["pastes_repository.go"],
-    importpath = "github.com/meanii/pipebin.dev/services/api/cmd/repository",
+    importpath = "github.com/meanii/pipebin.dev/services/api/repository",
     visibility = ["//visibility:public"],
     deps = [
         "//libs/models",

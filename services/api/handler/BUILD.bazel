@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "handler",
     srcs = ["pastes_handler.go"],
-    importpath = "github.com/meanii/pipebin.dev/services/api/cmd/handler",
+    importpath = "github.com/meanii/pipebin.dev/services/api/handler",
     visibility = ["//visibility:public"],
     deps = [
         "//libs/models",

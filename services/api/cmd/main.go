@@ -6,12 +6,12 @@ import (
 	"net/http"
 
 	"github.com/meanii/pipebin.dev/libs/logger"
-	"github.com/meanii/pipebin.dev/services/api/cmd/handler"
-	"github.com/meanii/pipebin.dev/services/api/cmd/repository"
+	"github.com/meanii/pipebin.dev/services/api/handler"
 	"github.com/meanii/pipebin.dev/services/api/internal/config"
 	"github.com/meanii/pipebin.dev/services/api/internal/database"
 	"github.com/meanii/pipebin.dev/services/api/internal/server"
 	"github.com/meanii/pipebin.dev/services/api/internal/services"
+	"github.com/meanii/pipebin.dev/services/api/repository"
 	"go.uber.org/zap"
 )
 

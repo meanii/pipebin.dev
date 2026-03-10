@@ -3,7 +3,7 @@ package database
 import (
 	"time"
 
-	"github.com/meanii/pipebin.dev/services/api/cmd/repository"
+	"github.com/meanii/pipebin.dev/services/api/repository"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

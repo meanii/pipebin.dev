@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	"github.com/meanii/pipebin.dev/services/api/cmd/handler"
+	"github.com/meanii/pipebin.dev/services/api/handler"
 )
 
 type Dependencies struct {

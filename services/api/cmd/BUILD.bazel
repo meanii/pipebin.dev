@@ -7,12 +7,12 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//libs/logger",
-        "//services/api/cmd/handler",
-        "//services/api/cmd/repository",
+        "//services/api/handler",
         "//services/api/internal/config",
         "//services/api/internal/database",
         "//services/api/internal/server",
         "//services/api/internal/services",
+        "//services/api/repository",
         "@org_uber_go_zap//:zap",
     ],
 )

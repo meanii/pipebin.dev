@@ -6,7 +6,7 @@ go_library(
     importpath = "github.com/meanii/pipebin.dev/services/api/internal/database",
     visibility = ["//services/api:__subpackages__"],
     deps = [
-        "//services/api/cmd/repository",
+        "//services/api/repository",
         "@io_gorm_driver_postgres//:postgres",
         "@io_gorm_gorm//:gorm",
         "@org_uber_go_zap//:zap",

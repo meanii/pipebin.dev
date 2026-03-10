@@ -6,7 +6,7 @@ import (
 
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"github.com/meanii/pipebin.dev/libs/models"
-	"github.com/meanii/pipebin.dev/services/api/cmd/repository"
+	"github.com/meanii/pipebin.dev/services/api/repository"
 )
 
 // keeping 24 length of nano ID
