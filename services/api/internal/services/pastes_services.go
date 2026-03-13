@@ -32,7 +32,7 @@ func (s *PastesService) CreatePaste(ctx context.Context, input models.CreatePast
 		PublicID:  publicId,
 		Title:     input.Title,
 		Content:   input.Content,
-		Language:  input.Content,
+		Language:  input.Language,
 		IPHash:    input.IPHash,
 		UserAgent: input.UserAgent,
 	}
