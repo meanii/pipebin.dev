@@ -2,7 +2,10 @@ load("@rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "httpx",
-    srcs = ["client_ip.go"],
+    srcs = [
+        "client_ip.go",
+        "response.go",
+    ],
     importpath = "github.com/meanii/pipebin.dev/services/api/internal/httpx",
     visibility = ["//services/api:__subpackages__"],
 )

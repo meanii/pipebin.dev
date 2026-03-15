@@ -6,9 +6,10 @@ go_library(
     importpath = "github.com/meanii/pipebin.dev/services/api/handler",
     visibility = ["//visibility:public"],
     deps = [
+        "//libs/hash",
         "//libs/models",
         "//services/api/internal/httpx",
         "//services/api/internal/services",
-        "@org_uber_go_zap//:zap",
+        "@com_github_go_playground_validator_v10//:validator",
     ],
 )

@@ -6,10 +6,11 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-playground/validator/v10"
+	"github.com/meanii/pipebin.dev/libs/hash"
 	"github.com/meanii/pipebin.dev/libs/models"
 	"github.com/meanii/pipebin.dev/services/api/internal/httpx"
 	"github.com/meanii/pipebin.dev/services/api/internal/services"
-	"go.uber.org/zap"
 )
 
 type PasteHandler struct {
@@ -24,34 +25,42 @@ func NewPasteHandler(pasteService services.PastesService) *PasteHandler {
 
 func (h *PasteHandler) CreatePaste(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		Title     string     `json:"title"`
-		Content   string     `json:"content"`
-		Langauge  string     `json:"language"`
+		Title     string     `json:"title" validate:"required"`
+		Content   string     `json:"content" validate:"required"`
+		Langauge  string     `json:"language" validate:"required"`
 		ExpiresAt *time.Time `json:"expires_at"`
 	}
+	var err error
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httpx.EResponse(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = validator.New(validator.WithRequiredStructEnabled()).Struct(&req)
+	if err != nil {
+		httpx.EResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	userIP := httpx.GetClientIP(r)
-	zap.S().Infof("userIp: ", userIP)
+	userIPHash := hash.GetSHA256Hash(userIP)
 
 	publicID, err := h.pasteService.CreatePaste(r.Context(), models.CreatePasteInput{
 		Title:     req.Title,
 		Content:   req.Content,
 		Language:  req.Langauge,
 		ExpiresAt: req.ExpiresAt,
-		IPHash:    userIP,
+		IPHash:    userIPHash,
 		UserAgent: r.Header.Get("User-Agent"),
 	})
 	if err != nil {
-		http.Error(w, "failed to create bin", http.StatusBadGateway)
+		httpx.EResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	pipebinUrl := fmt.Sprintf("http://localhost:8002/p/%s", publicID)
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(pipebinUrl))
+	httpx.Response(w, map[string]interface{}{
+		"url": pipebinUrl,
+	}, http.StatusCreated)
 }

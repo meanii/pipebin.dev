@@ -7,5 +7,6 @@ import (
 
 func main() {
 	cfg := config.LoadConfig()
-	logger.SetupLogger(cfg.LOGGER)
+	logger.Setup(cfg.LOGGER)
+	defer logger.Sync()
 }

@@ -17,7 +17,7 @@ import (
 
 func main() {
 	cfg := config.LoadConfig()
-	logger.Setup(cfg.LOGGER)
+	logger.Setup(logger.Env())
 	defer logger.Sync()
 
 	database, err := database.New(cfg.POSTGRESQL_DSN)

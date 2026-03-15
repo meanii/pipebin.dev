@@ -11,6 +11,7 @@ type Paste struct {
 	PublicID  string
 	Title     string
 	Content   string
+	Size      int
 	Language  string
 	IPHash    string
 	UserAgent string

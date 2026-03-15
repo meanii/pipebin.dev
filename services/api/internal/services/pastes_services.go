@@ -3,9 +3,11 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"github.com/meanii/pipebin.dev/libs/models"
+	"github.com/meanii/pipebin.dev/services/api/internal/config"
 	"github.com/meanii/pipebin.dev/services/api/repository"
 )
 
@@ -24,14 +26,21 @@ func NewPastesService(pastesRepo repository.PastesRepository) *PastesService {
 
 func (s *PastesService) CreatePaste(ctx context.Context, input models.CreatePasteInput) (string, error) {
 
+	size := len(input.Content)
+	if size >= config.GlobalConfig.MAX_PASTE_SIZE_IN_BYTES {
+		return "", fmt.Errorf("content size must be less than %d bytes.", config.GlobalConfig.MAX_PASTE_SIZE_IN_BYTES)
+	}
+
 	publicId, err := gonanoid.New(MAX_NANO_ID_LEN)
 	if err != nil {
 		return "", err
 	}
+
 	paste := &models.Paste{
 		PublicID:  publicId,
 		Title:     input.Title,
 		Content:   input.Content,
+		Size:      size,
 		Language:  input.Language,
 		IPHash:    input.IPHash,
 		UserAgent: input.UserAgent,

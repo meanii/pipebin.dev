@@ -15,8 +15,9 @@ type PasteModel struct {
 	PublicID  string     `gorm:"type:VARCHAR(50);not null;column:public_id"`
 	Title     string     `gorm:"type:VARCHAR(50);not null;column:title"`
 	Content   string     `gorm:"type:TEXT;column:content"`
+	Size      int        `gorm:"type:INT;column:size"`
 	Language  string     `gorm:"type:VARCHAR(50);not null;column:language"`
-	IPHash    string     `gorm:"type:INET;not null;column:ip_hash"`
+	IPHash    string     `gorm:"type:VARCHAR(255);not null;column:ip_hash"`
 	UserAgent string     `gorm:"type:VARCHAR(255);column:user_agent"`
 	ExpiresAt *time.Time `gorm:"type:TIMESTAMPTZ;column:expires_at"`
 	CreatedAt time.Time  `gorm:"autoCreateTime"`
@@ -37,6 +38,7 @@ func (r *PastesRepository) Create(ctx context.Context, paste *models.Paste) erro
 		PublicID:  paste.PublicID,
 		Title:     paste.Title,
 		Content:   paste.Content,
+		Size:      paste.Size,
 		Language:  paste.Language,
 		IPHash:    paste.IPHash,
 		UserAgent: paste.UserAgent,
@@ -51,7 +53,7 @@ func (r *PastesRepository) GetByPublicID(ctx context.Context, publicID string) (
 	if publicID == "" {
 		return nil, errors.New("provide valid publicID")
 	}
-	err := r.db.WithContext(ctx).Where("PublicID = ?", publicID).First(&paste).Error
+	err := r.db.WithContext(ctx).Where("public_id = ?", publicID).First(&paste).Error
 	return &models.Paste{
 		ID:        paste.ID,
 		Title:     paste.Title,

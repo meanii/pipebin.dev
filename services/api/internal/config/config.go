@@ -1,18 +1,30 @@
 package config
 
-import "github.com/meanii/pipebin.dev/libs/config"
+import (
+	"sync"
+
+	"github.com/meanii/pipebin.dev/libs/config"
+)
 
 type Config struct {
-	APP_PORT       string
-	POSTGRESQL_DSN string
-	LOGGER         string
+	APP_PORT                string
+	POSTGRESQL_DSN          string
+	MAX_PASTE_SIZE_IN_BYTES int
+	LOGGER                  string
 }
 
+var GlobalConfig *Config
+
 func LoadConfig() *Config {
-	config.LoadDotEnv(".env", "configs")
-	return &Config{
-		APP_PORT:       config.GetEnv("APP_PORT", "8001"),
-		POSTGRESQL_DSN: config.MustGetEnv("POSTGRESQL_DSN"),
-		LOGGER:         config.GetEnv("LOGGER", "development"),
-	}
+	once := sync.Once{}
+	once.Do(func() {
+		config.LoadDotEnv(".env", "configs")
+		GlobalConfig = &Config{
+			APP_PORT:                config.GetEnv("APP_PORT", "8001"),
+			POSTGRESQL_DSN:          config.MustGetEnv("POSTGRESQL_DSN"),
+			MAX_PASTE_SIZE_IN_BYTES: config.GetEnv("MAX_PASTE_SIZE_IN_BYTES", 10<<20), // 10 MB
+			LOGGER:                  config.GetEnv("LOGGER", "development"),
+		}
+	})
+	return GlobalConfig
 }

@@ -1,0 +1,8 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "hash",
+    srcs = ["sha256hash.go"],
+    importpath = "github.com/meanii/pipebin.dev/libs/hash",
+    visibility = ["//visibility:public"],
+)

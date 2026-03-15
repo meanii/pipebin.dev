@@ -4,6 +4,8 @@ import (
 	"log"
 	"os"
 	"path"
+	"reflect"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -22,12 +24,23 @@ func LoadDotEnv(name, root string) {
 }
 
 // GetEnv get os.ENV, if not found return the fallback value
-func GetEnv(name string, defaultValue string) string {
+func GetEnv[T string | int](name string, defaultValue T) T {
 	value := os.Getenv(name)
 	if value == "" {
 		return defaultValue
 	}
-	return value
+	typeof := reflect.TypeOf(defaultValue).String()
+
+	switch typeof {
+	case "int":
+		intValue, err := strconv.Atoi(value)
+		if err != nil {
+			return defaultValue
+		}
+		return any(intValue).(T)
+	default:
+		return any(value).(T)
+	}
 }
 
 // MustGetEnv get os.ENV, if not found do fetal
