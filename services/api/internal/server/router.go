@@ -15,6 +15,7 @@ func NewRouter(deps Dependencies) *http.ServeMux {
 
 	// root endpoint (POST api.local.pipebin.dev)
 	mux.HandleFunc("POST /", deps.PasteHandler.CreatePaste)
+	mux.HandleFunc("GET /p/{public_id}", deps.PasteHandler.GetPasteByPublicID)
 
 	return mux
 }

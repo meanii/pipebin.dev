@@ -64,3 +64,15 @@ func (h *PasteHandler) CreatePaste(w http.ResponseWriter, r *http.Request) {
 		"url": pipebinUrl,
 	}, http.StatusCreated)
 }
+
+func (h *PasteHandler) GetPasteByPublicID(w http.ResponseWriter, r *http.Request) {
+	publicID := r.PathValue("public_id")
+	paste, err := h.pasteService.GetPasteByPublicID(r.Context(), publicID)
+	if err != nil {
+		httpx.EResponse(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	httpx.Response(w, map[string]interface{}{
+		"content": paste.Content,
+	}, http.StatusOK)
+}
