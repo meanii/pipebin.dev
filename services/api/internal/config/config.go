@@ -11,6 +11,7 @@ type Config struct {
 	POSTGRESQL_DSN          string
 	MAX_PASTE_SIZE_IN_BYTES int
 	LOGGER                  string
+	MAX_NANO_ID_LENGTH      int
 }
 
 var GlobalConfig *Config
@@ -23,6 +24,7 @@ func LoadConfig() *Config {
 			APP_PORT:                config.GetEnv("APP_PORT", "8001"),
 			POSTGRESQL_DSN:          config.MustGetEnv("POSTGRESQL_DSN"),
 			MAX_PASTE_SIZE_IN_BYTES: config.GetEnv("MAX_PASTE_SIZE_IN_BYTES", 10<<20), // 10 MB
+			MAX_NANO_ID_LENGTH:      config.GetEnv("MAX_NANO_ID_LENGTH", 24),
 			LOGGER:                  config.GetEnv("LOGGER", "development"),
 		}
 	})

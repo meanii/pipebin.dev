@@ -11,9 +11,6 @@ import (
 	"github.com/meanii/pipebin.dev/services/api/repository"
 )
 
-// keeping 24 length of nano ID
-const MAX_NANO_ID_LEN = 24
-
 type PastesService struct {
 	pastesRepository repository.PastesRepository
 }
@@ -31,7 +28,7 @@ func (s *PastesService) CreatePaste(ctx context.Context, input models.CreatePast
 		return "", fmt.Errorf("content size must be less than %d bytes.", config.GlobalConfig.MAX_PASTE_SIZE_IN_BYTES)
 	}
 
-	publicId, err := gonanoid.New(MAX_NANO_ID_LEN)
+	publicId, err := gonanoid.New(config.GlobalConfig.MAX_NANO_ID_LENGTH)
 	if err != nil {
 		return "", err
 	}
@@ -54,7 +51,7 @@ func (s *PastesService) CreatePaste(ctx context.Context, input models.CreatePast
 }
 
 func (s *PastesService) GetPasteByPublicID(ctx context.Context, publicID string) (*models.Paste, error) {
-	if len(publicID) != MAX_NANO_ID_LEN {
+	if len(publicID) != config.GlobalConfig.MAX_NANO_ID_LENGTH {
 		return nil, errors.New("invalid publicID")
 	}
 	return s.pastesRepository.GetByPublicID(ctx, publicID)
