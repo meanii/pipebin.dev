@@ -8,6 +8,7 @@ go_library(
     deps = [
         "//libs/hash",
         "//libs/models",
+        "//services/api/internal/config",
         "//services/api/internal/httpx",
         "//services/api/internal/services",
         "@com_github_go_playground_validator_v10//:validator",

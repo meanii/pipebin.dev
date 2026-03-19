@@ -9,6 +9,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/meanii/pipebin.dev/libs/hash"
 	"github.com/meanii/pipebin.dev/libs/models"
+	"github.com/meanii/pipebin.dev/services/api/internal/config"
 	"github.com/meanii/pipebin.dev/services/api/internal/httpx"
 	"github.com/meanii/pipebin.dev/services/api/internal/services"
 )
@@ -59,7 +60,7 @@ func (h *PasteHandler) CreatePaste(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pipebinUrl := fmt.Sprintf("http://localhost:8002/p/%s", publicID)
+	pipebinUrl := fmt.Sprintf("%s/p/%s", config.GlobalConfig.FRONTEND_URL, publicID)
 	httpx.Response(w, map[string]interface{}{
 		"url": pipebinUrl,
 	}, http.StatusCreated)
@@ -73,6 +74,11 @@ func (h *PasteHandler) GetPasteByPublicID(w http.ResponseWriter, r *http.Request
 		return
 	}
 	httpx.Response(w, map[string]interface{}{
-		"content": paste.Content,
+		"id":         paste.ID,
+		"title":      paste.Title,
+		"content":    paste.Content,
+		"language":   paste.Language,
+		"created_at": paste.CreatedAt,
+		"expires_at": paste.ExpiresAt,
 	}, http.StatusOK)
 }
