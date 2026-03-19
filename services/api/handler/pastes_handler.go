@@ -26,10 +26,13 @@ func NewPasteHandler(pasteService services.PastesService) *PasteHandler {
 
 func (h *PasteHandler) CreatePaste(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		Title     string     `json:"title" validate:"required"`
-		Content   string     `json:"content" validate:"required"`
-		Langauge  string     `json:"language" validate:"required"`
-		ExpiresAt *time.Time `json:"expires_at"`
+		Title    string `json:"title" validate:"required"`
+		Content  string `json:"content" validate:"required"`
+		Langauge string `json:"language" validate:"required"`
+
+		// Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+		// such as "300ms", "-1.5h" or "2h45m".
+		ExpiresAt string `json:"expires_at"`
 	}
 	var err error
 
@@ -44,14 +47,21 @@ func (h *PasteHandler) CreatePaste(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// parsing Client IP and creating SHA256 hash to respect users privacy
 	userIP := httpx.GetClientIP(r)
 	userIPHash := hash.GetSHA256Hash(userIP)
+
+	var ExpiresAt time.Time
+	duration, err := time.ParseDuration(req.ExpiresAt)
+	if err == nil {
+		ExpiresAt = time.Now().Add(duration)
+	}
 
 	publicID, err := h.pasteService.CreatePaste(r.Context(), models.CreatePasteInput{
 		Title:     req.Title,
 		Content:   req.Content,
 		Language:  req.Langauge,
-		ExpiresAt: req.ExpiresAt,
+		ExpiresAt: &ExpiresAt,
 		IPHash:    userIPHash,
 		UserAgent: r.Header.Get("User-Agent"),
 	})
@@ -73,6 +83,16 @@ func (h *PasteHandler) GetPasteByPublicID(w http.ResponseWriter, r *http.Request
 		httpx.EResponse(w, err.Error(), http.StatusNotFound)
 		return
 	}
+
+	// check if bin is expired, if enabled
+	if paste.ExpiresAt != nil {
+		expried := time.Now().After(*paste.ExpiresAt)
+		if expried {
+			httpx.EResponse(w, "bin has been expired", http.StatusGone)
+			return
+		}
+	}
+
 	httpx.Response(w, map[string]interface{}{
 		"id":         paste.ID,
 		"title":      paste.Title,
