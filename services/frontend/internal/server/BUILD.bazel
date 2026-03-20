@@ -1,0 +1,9 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "server",
+    srcs = ["router.go"],
+    importpath = "github.com/meanii/pipebin.dev/services/frontend/internal/server",
+    visibility = ["//services/frontend:__subpackages__"],
+    deps = ["//services/frontend/handlers"],
+)

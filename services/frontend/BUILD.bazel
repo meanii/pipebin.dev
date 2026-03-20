@@ -1,0 +1,12 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "frontend",
+    srcs = ["embed.go"],
+    embedsrcs = [
+        "static/style.css",
+        "templates/index.html",
+    ],
+    importpath = "github.com/meanii/pipebin.dev/services/frontend",
+    visibility = ["//visibility:public"],
+)

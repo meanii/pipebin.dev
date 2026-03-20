@@ -7,6 +7,9 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//libs/logger",
+        "//services/frontend",
+        "//services/frontend/handlers",
         "//services/frontend/internal/config",
+        "//services/frontend/internal/server",
     ],
 )
