@@ -33,9 +33,9 @@ pipebin.dev/
 
 ### Bugs
 
-- [ ] **`pastes_handler.go`** — `zap.S().Infof("userIp: ", userIP)` is missing the `%s` format verb; should be `zap.S().Infof("userIp: %s", userIP)`
+- [X] **`pastes_handler.go`** — `zap.S().Infof("userIp: ", userIP)` is missing the `%s` format verb; should be `zap.S().Infof("userIp: %s", userIP)`
 - [ ] **`frontend/cmd/main.go`** — calls `logger.SetupLogger(...)` which does not exist; the correct function is `logger.Setup(...)`
-- [ ] **`repository/pastes_repository.go`** — `GetByPublicID` does not populate `PublicID` in the returned `models.Paste` struct
+- [X] **`repository/pastes_repository.go`** — `GetByPublicID` does not populate `PublicID` in the returned `models.Paste` struct
 
 ---
 
@@ -54,9 +54,9 @@ pipebin.dev/
 - [X] **Add `GET /p/{id}` route** — wire up the existing `GetPasteByPublicID` service method to a new `GetPaste` HTTP handler; register the route in `server/router.go`
 - [X] **Implement `GetPaste` handler** — return the full paste payload as JSON (`id`, `title`, `content`, `language`, `created_at`, `expires_at`); return `404` when not found, `410 Gone` when expired
 - [X] **Return structured JSON from all handlers** — replace plain-text `w.Write([]byte(...))` responses with a consistent JSON envelope (e.g. `{ "data": ..., "error": null }`)
-- [ ] **Make the paste URL dynamic** — the `pipebinUrl` in `CreatePaste` is hardcoded to `http://localhost:8002`; derive the base URL from config (`FRONTEND_BASE_URL` env var)
-- [ ] **Hash IP addresses before persisting** — store a SHA-256 (or bcrypt) hash of the client IP instead of the raw IP to respect user privacy; update `INET` column type to `VARCHAR` or `BYTEA` accordingly
-- [ ] **Add input validation** — validate `CreatePaste` request body:
+- [X] **Make the paste URL dynamic** — the `pipebinUrl` in `CreatePaste` is hardcoded to `http://localhost:8002`; derive the base URL from config (`FRONTEND_BASE_URL` env var)
+- [X] **Hash IP addresses before persisting** — store a SHA-256 (or bcrypt) hash of the client IP instead of the raw IP to respect user privacy; update `INET` column type to `VARCHAR` or `BYTEA` accordingly
+- [X] **Add input validation** — validate `CreatePaste` request body:
   - `content` must not be empty
   - `title` max length 255 characters
   - `content` max length configurable (e.g. 1 MB default)

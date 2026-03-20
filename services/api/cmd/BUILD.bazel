@@ -10,6 +10,7 @@ go_library(
         "//services/api/handler",
         "//services/api/internal/config",
         "//services/api/internal/database",
+        "//services/api/internal/middleware",
         "//services/api/internal/server",
         "//services/api/internal/services",
         "//services/api/repository",

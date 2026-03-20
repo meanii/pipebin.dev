@@ -9,6 +9,7 @@ import (
 	"github.com/meanii/pipebin.dev/services/api/handler"
 	"github.com/meanii/pipebin.dev/services/api/internal/config"
 	"github.com/meanii/pipebin.dev/services/api/internal/database"
+	"github.com/meanii/pipebin.dev/services/api/internal/middleware"
 	"github.com/meanii/pipebin.dev/services/api/internal/server"
 	"github.com/meanii/pipebin.dev/services/api/internal/services"
 	"github.com/meanii/pipebin.dev/services/api/repository"
@@ -25,11 +26,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	mux := server.NewRouter(server.Dependencies{
+	handler := server.NewRouter(server.Dependencies{
 		PasteHandler: *handler.NewPasteHandler(*services.NewPastesService(
 			*repository.NewPasteRespository(database),
 		)),
 	})
+
+	mux := server.EnableGlobalMiddlewares(
+		handler,
+		middleware.RequestIDMiddleware,
+	)
 
 	zap.S().Infof("api.internal.pipebin.dev listening on http://0.0.0.0:%s", cfg.APP_PORT)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", cfg.APP_PORT), mux))
