@@ -5,7 +5,8 @@ go_library(
     srcs = ["embed.go"],
     embedsrcs = [
         "static/style.css",
-        "templates/index.html",
+        "templates/home.html",
+        "templates/layout.html",
     ],
     importpath = "github.com/meanii/pipebin.dev/services/frontend",
     visibility = ["//visibility:public"],

@@ -10,6 +10,7 @@ import (
 	"github.com/meanii/pipebin.dev/services/frontend/handlers"
 	"github.com/meanii/pipebin.dev/services/frontend/internal/config"
 	"github.com/meanii/pipebin.dev/services/frontend/internal/server"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -23,5 +24,6 @@ func main() {
 	handler := handlers.NewFrontendHandler(templateFS, cfg.API_BASE_URL)
 	router := server.NewRouter(handler, staticFS)
 
+	zap.L().Sugar().Infof("pipebin.dev running on http://0.0.0.0:%s", cfg.FA_PORT)
 	http.ListenAndServe(fmt.Sprintf(":%s", cfg.FA_PORT), router)
 }

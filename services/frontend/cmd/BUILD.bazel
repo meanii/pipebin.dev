@@ -1,15 +1,22 @@
-load("@rules_go//go:def.bzl", "go_library")
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
 
 go_library(
-    name = "cmd",
+    name = "cmd_lib",
     srcs = ["main.go"],
     importpath = "github.com/meanii/pipebin.dev/services/frontend/cmd",
-    visibility = ["//visibility:public"],
+    visibility = ["//visibility:private"],
     deps = [
         "//libs/logger",
         "//services/frontend",
         "//services/frontend/handlers",
         "//services/frontend/internal/config",
         "//services/frontend/internal/server",
+        "@org_uber_go_zap//:zap",
     ],
+)
+
+go_binary(
+    name = "cmd",
+    embed = [":cmd_lib"],
+    visibility = ["//visibility:public"],
 )
