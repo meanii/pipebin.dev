@@ -12,6 +12,5 @@ go_library(
         "//services/api/internal/httpx",
         "//services/api/internal/services",
         "@com_github_go_playground_validator_v10//:validator",
-        "@org_uber_go_zap//:zap",
     ],
 )
