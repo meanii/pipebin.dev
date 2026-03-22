@@ -3,10 +3,21 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{{.Title}} - AN_CH</title>
+        <title>{{.Title}}</title>
         <link rel="stylesheet" href="/static/style.css" />
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/@knadh/oat/oat.min.css"
+        />
+        <script src="https://unpkg.com/@knadh/oat/oat.min.js" defer></script>
     </head>
     <body>
-        <main class="container">Hi</main>
+        <main class="container">
+            {{if eq .Page "home"}} {{template "home" .}} {{else if eq .Page
+            "paste"}} {{template "paste" .}} {{else if eq .Page
+            "upload_result"}} {{template "upload_result" .}} {{else if eq .Page
+            "error"}} {{template "error" .}} {{else if eq .Page "404"}}
+            {{template "404" .}} {{end}}
+        </main>
     </body>
 </html>

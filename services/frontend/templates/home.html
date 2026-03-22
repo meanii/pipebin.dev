@@ -1,0 +1,83 @@
+{{ define "home" }}
+
+<header class="site-header">
+    <a href="/" class="site-logo">pipebin<span class="tld">.dev</span></a>
+    <p class="site-tagline">
+        Minimal pastebin for developers. Pipe logs, code, and stdout —
+        instantly.
+    </p>
+</header>
+
+<section>
+    <p class="section-label">Quick start</p>
+    <pre><code>$ dmesg | curl -X POST https://pipebin.dev --data-binary @-
+→ https://pipebin.dev/p/xk9d2m
+
+$ cat deploy.log | curl https://pipebin.dev --data-binary @-
+→ https://pipebin.dev/p/r4n8pq
+
+$ curl https://pipebin.dev -d "$(git diff HEAD~1)"
+→ https://pipebin.dev/p/m2k5vx</code></pre>
+</section>
+
+<section>
+    <p class="section-label">Options</p>
+    <pre><code># Set expiry (1h, 6h, 24h, 7d, 30d)
+$ curl -F "expires=1h" -F "c=@logfile.txt" https://pipebin.dev
+
+# Set a title
+$ curl -F "title=deploy-log" -F "c=@deploy.log" https://pipebin.dev
+
+# Retrieve later (plain text, always)
+$ curl https://pipebin.dev/raw/xk9d2m</code></pre>
+</section>
+
+<section>
+    <p class="section-label">API</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="method method-post">POST</span></td>
+                <td><code>/</code></td>
+                <td>Create a new paste</td>
+            </tr>
+            <tr>
+                <td><span class="method method-get">GET</span></td>
+                <td><code>/p/{id}</code></td>
+                <td>View paste — HTML in browser, plain text via curl</td>
+            </tr>
+            <tr>
+                <td><span class="method method-get">GET</span></td>
+                <td><code>/raw/{id}</code></td>
+                <td>Raw plain text, always</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <p class="section-label">Features</p>
+    <ul class="features">
+        <li>No login required</li>
+        <li>Large log support</li>
+        <li>Raw plain text output</li>
+        <li>Expiring pastes</li>
+        <li>curl-friendly API</li>
+        <li>Browser + curl aware</li>
+        <li>Fast and minimal</li>
+        <li>No JavaScript required</li>
+    </ul>
+</section>
+
+<footer class="site-footer">
+    pipebin.dev &mdash; minimal pastebin for developers
+</footer>
+
+{{ end }}

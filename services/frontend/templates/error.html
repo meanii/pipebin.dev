@@ -1,0 +1,12 @@
+{{ define "error" }}
+<nav class="site-nav">
+    <a href="/" class="back-link">← pipebin.dev</a>
+</nav>
+
+<div class="status-page">
+    <div class="status-code">err</div>
+    <h2 class="status-heading">Something went wrong</h2>
+    <p class="status-desc">{{ .Error }}</p>
+    <a href="/">← back to home</a>
+</div>
+{{ end }}

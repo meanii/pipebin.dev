@@ -1,0 +1,26 @@
+{{ define "paste" }}
+<nav class="site-nav">
+    <a href="/" class="back-link">← pipebin.dev</a>
+</nav>
+
+<div class="paste-header">
+    {{ if .PasteTitle }}
+    <h2 class="paste-title">{{ .PasteTitle }}</h2>
+    {{ end }}
+    <div class="paste-meta">
+        <span class="paste-id">{{ .PasteID }}</span>
+        <span class="paste-meta-sep">·</span>
+        <span>{{ .CreatedAt }}</span>
+        {{ if .ExpiresAt }}
+        <span class="paste-meta-sep">·</span>
+        <span>expires {{ .ExpiresAt }}</span>
+        {{ end }}
+        <span class="paste-meta-sep">·</span>
+        <a href="/raw/{{ .PasteID }}">raw ↗</a>
+    </div>
+</div>
+
+<div class="paste-content">
+    <pre><code>{{ .Content }}</code></pre>
+</div>
+{{ end }}

@@ -1,0 +1,23 @@
+{{ define "upload_result" }}
+<nav class="site-nav">
+    <a href="/" class="back-link">← pipebin.dev</a>
+</nav>
+
+<div role="alert" data-variant="success">Paste created successfully.</div>
+
+<div class="url-result mt-4">
+    <div class="url-row">
+        <span class="url-label">url</span>
+        <span class="url-value"><code>{{ .PasteURL }}</code></span>
+        <a href="{{ .PasteURL }}" class="url-action">open ↗</a>
+    </div>
+    <div class="url-row">
+        <span class="url-label">raw</span>
+        <span class="url-value"><code>{{ .RawURL }}</code></span>
+        <a href="{{ .RawURL }}" class="url-action">open ↗</a>
+    </div>
+</div>
+
+<pre><code># Retrieve with curl
+$ curl {{ .RawURL }}</code></pre>
+{{ end }}
