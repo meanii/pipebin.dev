@@ -1,6 +1,9 @@
 # pipebin.dev
 
-> Minimal pastebin for developers. Pipe logs, code, and stdout directly from your terminal.
+<div align="center">
+  <img src="assets/logo.svg" alt="pipebin.dev" width="520" />
+  <p>Minimal pastebin for developers. Pipe logs, code, and stdout directly from your terminal.</p>
+</div>
 
 ```bash
 cat crash.log | curl -sT - https://pipebin.dev/
