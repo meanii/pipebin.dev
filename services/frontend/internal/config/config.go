@@ -11,7 +11,7 @@ type Config struct {
 func LoadConfig() *Config {
 	return &Config{
 		FA_PORT:      config.GetEnv("FA_PORT", "8002"),
-		API_BASE_URL: config.GetEnv("API_BASE_URL", "http://localhost:8002"),
+		API_BASE_URL: config.GetEnv("API_BASE_URL", "http://localhost:8001"),
 		LOGGER:       config.GetEnv("LOGGER", "development"),
 	}
 }

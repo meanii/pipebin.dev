@@ -1,15 +1,55 @@
 ---
 services:
   postgres:
-    image: postgres
+    image: postgres:16-alpine
     environment:
       POSTGRES_USER: pipebin
       POSTGRES_PASSWORD: pipebin
       POSTGRES_DB: pipebin
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U pipebin -d pipebin"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 3s
+      timeout: 2s
+      retries: 10
+      start_period: 5s
+      start_interval: 1s
     ports:
-      - 5432:5432
+      - "5432:5432"
+
+  api:
+    build:
+      context: ..
+      dockerfile: services/api/Dockerfile
+    environment:
+      APP_PORT: "8001"
+      POSTGRESQL_DSN: "postgresql://pipebin:pipebin@postgres:5432/pipebin"
+      FRONTEND_URL: "http://localhost:8002"
+      MAX_PASTE_SIZE_IN_BYTES: "10485760"
+      MAX_NANO_ID_LENGTH: "24"
+      LOGGER: "production"
+    ports:
+      - "8001:8001"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8001/healthz || exit 1"]
+      interval: 3s
+      timeout: 2s
+      retries: 10
+      start_period: 5s
+      start_interval: 1s
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: services/frontend/Dockerfile
+    environment:
+      FA_PORT: "8002"
+      API_BASE_URL: "http://api:8001"
+      LOGGER: "production"
+    ports:
+      - "8002:8002"
+    depends_on:
+      api:
+        condition: service_healthy

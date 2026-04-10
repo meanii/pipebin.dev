@@ -1,93 +1,319 @@
 # pipebin.dev
-> A developer-friendly pastebin for sharing logs, code and stdout.
+
+> Minimal pastebin for developers. Pipe logs, code, and stdout directly from your terminal.
+
+```bash
+cat crash.log | curl -sT - https://pipebin.dev/
+→ https://pipebin.dev/p/xk9d2mA1B2fg
+```
+
+---
+
+## Features
+
+- **No login required** — paste and share immediately
+- **Pipe-friendly** — raw body, JSON, or HTML form
+- **Language auto-detection** — Chroma analyses content when no language is specified
+- **Syntax highlighting with line numbers** — server-side via Chroma v2 (`github-dark` theme)
+- **Burn after reading** — paste is deleted immediately after the first view (`?once=1`)
+- **Expiring pastes** — set a TTL with `?e=1h`, `?e=24h`, `?e=7d`
+- **Raw plain text** — `GET /raw/{id}` for piping into other tools
+- **curl-friendly** — plain text URL response when called from curl
+- **Shell alias** — one-liner to add to your shell config
+- **10 MB paste limit**
+- **No JavaScript required**
+- **IP privacy** — client IP is SHA-256 hashed before storage
+
+---
+
+## Usage
+
+### Simple pipe
+
+```bash
+cat file.go | curl -sT - https://pipebin.dev/
+→ https://pipebin.dev/p/xk9d2m
+```
+
+> **Why `-sT -`?**
+> `curl -T` sends a raw PUT request with no encoding — whitespace, tabs, and indentation are preserved exactly.
+> `curl -d` URL-encodes the body which destroys indentation.
+
+### With metadata
+
+Query params let you attach metadata in raw pipe mode:
+
+| Param | Alias | Description |
+| --- | --- | --- |
+| `?t=` | — | Paste title |
+| `?lang=` | — | Language (e.g. `go`, `python`, `bash`, `json`) |
+| `?e=` | `?expires=` | Expiry duration (e.g. `1h`, `24h`, `168h`) |
+| `?once=1` | `?burn=1` | Burn after reading — deleted on first view |
+
+```bash
+# with title, language, and expiry
+dmesg | curl -sT - "https://pipebin.dev/?t=dmesg&lang=bash&e=6h"
+→ https://pipebin.dev/p/ab3f7x
+
+# burn after reading — deleted the moment someone opens it
+echo "my-secret-token" | curl -sT - "https://pipebin.dev/?once=1"
+→ https://pipebin.dev/p/zz9k1q
+   ⚠  burn after reading — deleted on first view
+```
+
+### Fetch raw output
+
+```bash
+curl -s https://pipebin.dev/raw/xk9d2m
+```
+
+### JSON API
+
+```bash
+curl -s https://pipebin.dev/ \
+  -H 'Content-Type: application/json' \
+  -d '{"title":"hello","content":"world","language":"go","expires_at":"24h"}'
+
+→ {"data":{"url":"https://pipebin.dev/p/cd4e8w","burn":false},"status":"Created"}
+```
+
+---
+
+## Shell alias
+
+Add this to your `~/.bashrc`, `~/.zshrc`, or `~/.config/fish/config.fish` for a one-command pipe:
+
+### bash / zsh
+
+```bash
+pb() { curl -sT - "https://pipebin.dev/$@"; }
+```
+
+### fish
+
+```fish
+function pb
+    curl -sT - "https://pipebin.dev/$argv"
+end
+```
+
+### Usage after adding the alias
+
+```bash
+cat crash.log | pb
+→ https://pipebin.dev/p/xk9d2m
+
+cat secret.txt | pb '?once=1'
+→ https://pipebin.dev/p/zz9k1q
+   ⚠  burn after reading — deleted on first view
+
+cat deploy.sh | pb '?t=deploy&lang=bash&e=24h'
+→ https://pipebin.dev/p/ab3f7x
+```
+
+---
+
+## API Reference
+
+### `POST /` or `PUT /` — Create paste
+
+#### Raw pipe (recommended for curl)
+
+```bash
+curl -sT - "https://pipebin.dev/?t=title&lang=go&e=24h&once=1"
+```
+
+#### JSON body
+
+```json
+{
+  "title": "string (required)",
+  "content": "string (required)",
+  "language": "string (required, e.g. go / python / text)",
+  "expires_at": "string (optional, Go duration e.g. 1h, 24h, 168h)",
+  "burn": false
+}
+```
+
+#### Response `201 Created`
+
+```json
+{
+  "data": { "url": "https://pipebin.dev/p/<id>", "burn": false },
+  "status": "Created"
+}
+```
+
+#### curl response — plain text
+
+```text
+https://pipebin.dev/p/<id>
+```
+
+### `GET /p/{id}` — Get paste (JSON)
+
+#### Response `200 OK`
+
+```json
+{
+  "data": {
+    "id": "...",
+    "public_id": "...",
+    "title": "...",
+    "content": "...",
+    "language": "go",
+    "created_at": "2025-01-01T00:00:00Z",
+    "expires_at": null,
+    "burn_after_reading": false
+  }
+}
+```
+
+#### Error responses
+
+- `404 Not Found` — paste does not exist
+- `410 Gone` — paste has expired
+
+### `GET /raw/{id}` — Raw plain text
+
+Returns the paste content as `text/plain`. Use for piping into other tools:
+
+```bash
+curl -s https://pipebin.dev/raw/<id> | grep ERROR
+```
+
+---
+
+## Language auto-detection
+
+When `?lang=` is not provided in raw pipe mode, pipebin analyses the content using
+[Chroma's lexer analyser](https://github.com/alecthomas/chroma). If a language is confidently
+detected, it is applied automatically. Falls back to `text` when confidence is low or the
+content is plain prose.
+
+Auto-detection is only applied in raw pipe mode — JSON and form submissions always use the
+language you specify.
+
+---
+
+## Burn after reading
+
+Append `?once=1` (or `?burn=1`) to the URL when creating a paste. The paste is permanently
+deleted from the database the moment anyone opens the view URL — there is no second chance.
+
+```bash
+echo "POSTGRES_PASSWORD=hunter2" | curl -sT - "https://pipebin.dev/?once=1"
+→ https://pipebin.dev/p/zz9k1q
+   ⚠  burn after reading — deleted on first view
+```
+
+The view page displays a prominent warning confirming the paste has been burned.
+
+In JSON mode, set `"burn": true` in the request body.
+
+---
 
 ## Architecture
 
-```
+```text
 pipebin.dev/
 ├── services/
 │   ├── api/                  # REST API (port 8001)
-│   │   ├── cmd/              # Entrypoint
-│   │   ├── handler/          # HTTP handlers
-│   │   ├── repository/       # GORM DB layer
+│   │   ├── cmd/              # Entrypoint — wires DB → repo → service → handler
+│   │   ├── handler/          # HTTP handlers (pastes_handler.go)
+│   │   ├── repository/       # pgx raw SQL (pastes_repository.go + interface)
+│   │   ├── migrations/       # Embedded SQL migration files (golang-migrate)
 │   │   └── internal/
-│   │       ├── config/       # API config loader
-│   │       ├── database/     # DB connection + migrations
-│   │       ├── httpx/        # HTTP utilities (client IP)
+│   │       ├── config/       # API config (APP_PORT, POSTGRESQL_DSN, FRONTEND_URL, …)
+│   │       ├── database/     # pgxpool connection + migrate runner
+│   │       ├── httpx/        # JSON response helpers + client IP extraction
+│   │       ├── middleware/   # RequestID + logger middleware
 │   │       ├── server/       # Router / mux setup
-│   │       └── services/     # Business logic
+│   │       └── services/     # Business logic (CreatePaste, GetPasteByPublicID)
 │   └── frontend/             # Frontend server (port 8002)
-│       ├── cmd/              # Entrypoint
+│       ├── cmd/              # Entrypoint — embeds templates + static, starts server
+│       ├── handlers/         # Page handlers (Home, CreatePaste, Paste, RawPaste)
 │       └── internal/
-│           └── config/       # Frontend config loader
+│           ├── config/       # Frontend config (FA_PORT, API_BASE_URL, LOGGER)
+│           └── server/       # Router / mux setup
 ├── libs/
-│   ├── config/               # Shared env/config helpers
-│   ├── logger/               # Shared zap logger setup
-│   └── models/               # Shared domain models (Paste, CreatePasteInput)
+│   ├── config/               # Shared env helpers (GetEnv, MustGetEnv, LoadDotEnv)
+│   ├── hash/                 # SHA-256 IP hashing
+│   ├── logger/               # slog setup
+│   └── models/               # Shared domain structs (Paste, CreatePasteInput)
 ├── deployment/
-│   └── compose.local.yaml    # Local Docker Compose
-└── configs/                  # .env files (gitignored)
+│   └── compose.local.yaml    # Local Docker Compose (postgres + api + frontend)
+└── configs/                  # .env files (gitignored); see .env.example
 ```
 
-## TODO
+---
 
-### Bugs
+## Running locally
 
-- [X] **`pastes_handler.go`** — `zap.S().Infof("userIp: ", userIP)` is missing the `%s` format verb; should be `zap.S().Infof("userIp: %s", userIP)`
-- [ ] **`frontend/cmd/main.go`** — calls `logger.SetupLogger(...)` which does not exist; the correct function is `logger.Setup(...)`
-- [X] **`repository/pastes_repository.go`** — `GetByPublicID` does not populate `PublicID` in the returned `models.Paste` struct
+**Prerequisites:** Go 1.24+, Docker
+
+```bash
+# Start Postgres
+docker compose -f deployment/compose.local.yaml up postgres -d
+
+# Run API (port 8001)
+cd services/api && go run ./cmd
+
+# Run frontend in a separate terminal (port 8002)
+cd services/frontend && go run ./cmd
+```
+
+Or start everything with Docker Compose:
+
+```bash
+docker compose -f deployment/compose.local.yaml up
+```
+
+### Environment variables
+
+Copy `configs/.env.example` to `configs/.env` and adjust as needed.
+
+#### API (`configs/.env`)
+
+```bash
+APP_PORT=8001
+POSTGRESQL_DSN=postgresql://pipebin:pipebin@localhost:5432/pipebin
+FRONTEND_URL=http://localhost:8002
+MAX_PASTE_SIZE_IN_BYTES=10485760
+MAX_NANO_ID_LENGTH=24
+LOGGER=development
+```
+
+#### Frontend (same file or separate env)
+
+```bash
+FA_PORT=8002
+API_BASE_URL=http://localhost:8001
+LOGGER=development
+```
 
 ---
 
-### Infrastructure
+## Tech stack
 
-- [ ] **Remove AutoMigrate** — replace `db.AutoMigrate(...)` in `database/db.go` with a proper migration tool (e.g. [`golang-migrate`](https://github.com/golang-migrate/migrate)); write versioned SQL migration files under `services/api/migrations/`
-- [ ] **Add API + frontend services to `compose.local.yaml`** — currently only `postgres` is defined; add `api` and `frontend` service definitions with correct port mappings, env vars, and `depends_on: postgres`
-- [ ] **Populate `configs/`** — add a `configs/.env.example` template documenting all required env vars (`APP_PORT`, `POSTGRESQL_DSN`, `LOGGER`); document how to copy it to `configs/.env` in the README
-- [ ] **Add a health-check endpoint** — `GET /healthz` in the API returning DB connectivity status; use it in Docker Compose `healthcheck`
-- [ ] **Structured config validation on startup** — fail fast with a clear error message if required env vars are missing or malformed, rather than panicking deep in the stack
-
----
-
-### API Service (`services/api`)
-
-- [X] **Add `GET /p/{id}` route** — wire up the existing `GetPasteByPublicID` service method to a new `GetPaste` HTTP handler; register the route in `server/router.go`
-- [X] **Implement `GetPaste` handler** — return the full paste payload as JSON (`id`, `title`, `content`, `language`, `created_at`, `expires_at`); return `404` when not found, `410 Gone` when expired
-- [X] **Return structured JSON from all handlers** — replace plain-text `w.Write([]byte(...))` responses with a consistent JSON envelope (e.g. `{ "data": ..., "error": null }`)
-- [X] **Make the paste URL dynamic** — the `pipebinUrl` in `CreatePaste` is hardcoded to `http://localhost:8002`; derive the base URL from config (`FRONTEND_BASE_URL` env var)
-- [X] **Hash IP addresses before persisting** — store a SHA-256 (or bcrypt) hash of the client IP instead of the raw IP to respect user privacy; update `INET` column type to `VARCHAR` or `BYTEA` accordingly
-- [X] **Add input validation** — validate `CreatePaste` request body:
-  - `content` must not be empty
-  - `title` max length 255 characters
-  - `content` max length configurable (e.g. 1 MB default)
-  - `language` should be from an allowlist of known syntax identifiers
-  - `expires_at` must be in the future if provided
-- [ ] **Add OpenTelemetry trace ID injection** — instrument the API with `go.opentelemetry.io/otel`; propagate `trace_id` and `span_id` through context; export traces to an OTLP collector
-- [ ] **Add request-aware logger middleware** — write a middleware that enriches the zap logger in `context.Context` with `trace_id`, `request_id`, `method`, `path`, and `user_agent`; use this contextual logger in handlers and services instead of the global `zap.S()`
-- [ ] **Add rate limiting** — implement per-IP rate limiting on paste creation (e.g. using a token-bucket or leaky-bucket algorithm, or a Redis-backed store) to prevent abuse
-- [ ] **Add paste expiry cleanup worker** — implement a background goroutine (or scheduled job) that periodically deletes pastes where `expires_at < now()`; also enforce expiry on read (return `410 Gone` for expired pastes)
-- [ ] **Fix `GetByPublicID` GORM query** — column name casing issue: `Where("PublicID = ?", ...)` should use the snake_case column name `Where("public_id = ?", ...)` to match the `gorm:"column:public_id"` tag
+| Layer | Technology |
+| --- | --- |
+| Language | Go 1.24+ |
+| Database driver | `github.com/jackc/pgx/v5` — pgxpool, raw SQL (no ORM) |
+| Migrations | `github.com/golang-migrate/migrate/v4` — embedded SQL |
+| Validation | `github.com/go-ozzo/ozzo-validation/v4` |
+| Syntax highlighting | `github.com/alecthomas/chroma/v2` |
+| Logging | `log/slog` (stdlib) |
+| ID generation | `github.com/matoous/go-nanoid/v2` |
+| Frontend styles | [oat.css](https://oatcss.dev) CDN + custom CSS |
+| Build | Bazel + plain `go build ./...` |
 
 ---
 
-### Frontend Service (`services/frontend`)
+## TODO / Not yet implemented
 
-- [ ] **Bootstrap the HTTP server** — `frontend/cmd/main.go` loads config but never starts a server; add `net/http` listener on `FA_PORT`
-- [ ] **Implement paste creation page (`GET /`)** — HTML form with fields for title, content (textarea), language (dropdown), and optional expiry; `POST` to the API service on submit
-- [ ] **Implement paste view page (`GET /p/{id}`)** — fetch paste from the API, render content with syntax highlighting
-- [ ] **Add syntax highlighting** — integrate a server-side or client-side highlighter (e.g. [Chroma](https://github.com/alecthomas/chroma) server-side, or [highlight.js](https://highlightjs.org/) / [Shiki](https://shiki.matsu.io/) client-side)
-- [ ] **Add `FRONTEND_API_BASE_URL` config var** — frontend needs to know the API address; add to `frontend/internal/config/config.go` and document in `.env.example`
-- [ ] **Add copy-to-clipboard button** on paste view
-- [ ] **Add "raw" view** — `GET /p/{id}/raw` serving paste content as `text/plain` for use in shell pipelines (the core pipebin use case)
-- [ ] **Add `curl`-friendly API response** — detect `curl` user-agent on `POST /` and return the raw paste URL as plain text (no JSON wrapper) so `cmd | curl -F 'c=@-' https://pipebin.dev` works out of the box
-
----
-
-### Testing
-
-- [ ] **Service layer unit tests** — test `CreatePaste` and `GetPasteByPublicID` with a mock repository; cover happy path, invalid publicID length, expired paste, and DB errors
-- [ ] **Repository integration tests** — test `Create` and `GetByPublicID` against a real Postgres instance (spin up via `testcontainers-go` or use `compose.local.yaml`)
-- [ ] **Handler unit tests** — use `net/http/httptest` to test `CreatePaste` and `GetPaste` handlers; mock the service layer; cover bad request bodies, missing fields, and service errors
-- [ ] **IP hashing utility tests** — once IP hashing is added, unit-test the hash function with known inputs
-- [ ] **End-to-end test** — script a full round-trip: create a paste via `POST /`, fetch it via `GET /p/{id}`, assert content matches
-- [ ] **Add CI pipeline** — GitHub Actions workflow running `go test ./...` and `go vet ./...` on every PR; add Bazel build check
+- [ ] OpenTelemetry instrumentation
+- [ ] Repository integration tests (testcontainers)
+- [ ] Structured config validation on startup
+- [ ] Copy-to-clipboard button (requires JS; contradicts no-JS goal)
+- [ ] Rate limiting (currently only on API paste creation)

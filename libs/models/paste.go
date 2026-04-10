@@ -7,14 +7,15 @@ import (
 )
 
 type Paste struct {
-	ID        uuid.UUID
-	PublicID  string
-	Title     string
-	Content   string
-	Size      int
-	Language  string
-	IPHash    string
-	UserAgent string
-	ExpiresAt *time.Time
-	CreatedAt time.Time
+	ID               uuid.UUID
+	PublicID         string
+	Title            string
+	Content          string
+	Size             int
+	Language         string
+	IPHash           string
+	UserAgent        string
+	ExpiresAt        *time.Time
+	BurnAfterReading bool
+	CreatedAt        time.Time
 }

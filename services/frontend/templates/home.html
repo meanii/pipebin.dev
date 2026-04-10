@@ -2,34 +2,139 @@
 
 <header class="site-header">
     <a href="/" class="site-logo">pipebin<span class="tld">.dev</span></a>
-    <p class="site-tagline">
-        Minimal pastebin for developers. Pipe logs, code, and stdout —
-        instantly.
-    </p>
 </header>
 
-<section>
-    <p class="section-label">Quick start</p>
-    <pre><code>$ dmesg | curl -X POST https://pipebin.dev --data-binary @-
-→ https://pipebin.dev/p/xk9d2m
+<section class="hero-section">
+    <h1 class="hero-heading">Share anything.<br><span class="hero-accent">Instantly.</span></h1>
+    <p class="hero-sub">
+        Minimal pastebin for developers — pipe logs, code, and stdout
+        directly from your terminal. No login. No setup.
+    </p>
 
-$ cat deploy.log | curl https://pipebin.dev --data-binary @-
-→ https://pipebin.dev/p/r4n8pq
+    <div class="terminal-demo">
+        <div class="terminal-bar">
+            <span class="tdot tdot-r"></span>
+            <span class="tdot tdot-y"></span>
+            <span class="tdot tdot-g"></span>
+            <span class="terminal-bar-title">bash</span>
+        </div>
+        <div class="terminal-body">
+            <p class="tline"><span class="tprompt">$</span> cat crash.log <span class="tpipe">|</span> curl -sT - {{ .BaseURL }}/</p>
+            <p class="tline-out"><span class="tout-arrow">→</span> {{ .BaseURL }}/p/<span class="tout-id">xk9d2mA1B2fg</span></p>
+        </div>
+    </div>
+</section>
 
-$ curl https://pipebin.dev -d "$(git diff HEAD~1)"
-→ https://pipebin.dev/p/m2k5vx</code></pre>
+<section class="create-section">
+    <p class="section-label">Create paste</p>
+    <div class="form-card">
+        <form method="POST" action="/" class="paste-form">
+            <div class="form-row">
+                <input
+                    class="form-input"
+                    type="text"
+                    name="title"
+                    placeholder="Title (optional)"
+                    maxlength="255"
+                    autocomplete="off"
+                />
+                <select class="form-select" name="language">
+                    <option value="text">plain text</option>
+                    <option value="bash">bash / sh</option>
+                    <option value="go">go</option>
+                    <option value="python">python</option>
+                    <option value="javascript">javascript</option>
+                    <option value="typescript">typescript</option>
+                    <option value="rust">rust</option>
+                    <option value="json">json</option>
+                    <option value="yaml">yaml</option>
+                    <option value="toml">toml</option>
+                    <option value="sql">sql</option>
+                    <option value="dockerfile">dockerfile</option>
+                    <option value="html">html</option>
+                    <option value="css">css</option>
+                    <option value="c">c / c++</option>
+                </select>
+                <select class="form-select" name="expires_at">
+                    <option value="">never</option>
+                    <option value="1h">1 hour</option>
+                    <option value="6h">6 hours</option>
+                    <option value="24h">24 hours</option>
+                    <option value="168h">7 days</option>
+                    <option value="720h">30 days</option>
+                </select>
+            </div>
+            <textarea
+                class="form-textarea"
+                name="content"
+                placeholder="Paste content, logs, or code here…"
+                required
+                spellcheck="false"
+                autocorrect="off"
+                autocapitalize="off"
+                autofocus
+            ></textarea>
+            <div class="form-actions">
+                <button class="form-submit" type="submit">Create paste →</button>
+            </div>
+        </form>
+    </div>
 </section>
 
 <section>
-    <p class="section-label">Options</p>
-    <pre><code># Set expiry (1h, 6h, 24h, 7d, 30d)
-$ curl -F "expires=1h" -F "c=@logfile.txt" https://pipebin.dev
+    <p class="section-label">Quick start</p>
+    <div class="terminal-window">
+        <div class="terminal-bar">
+            <span class="tdot tdot-r"></span>
+            <span class="tdot tdot-y"></span>
+            <span class="tdot tdot-g"></span>
+        </div>
+        <pre><code># pipe anything — preserves whitespace and indentation
+$ cat file.go | curl -sT - {{ .BaseURL }}/
+→ {{ .BaseURL }}/p/xk9d2m
 
-# Set a title
-$ curl -F "title=deploy-log" -F "c=@deploy.log" https://pipebin.dev
+# with metadata  (?t=title  ?lang=go  ?e=24h  ?once=1)
+$ dmesg | curl -sT - "{{ .BaseURL }}/?t=dmesg&lang=bash&e=6h"
+→ {{ .BaseURL }}/p/ab3f7x
 
-# Retrieve later (plain text, always)
-$ curl https://pipebin.dev/raw/xk9d2m</code></pre>
+# burn after reading — deleted on first view
+$ echo "secret token" | curl -sT - "{{ .BaseURL }}/?once=1"
+→ {{ .BaseURL }}/p/zz9k1q
+   ⚠  burn after reading — deleted on first view
+
+# fetch raw output
+$ curl -s {{ .BaseURL }}/raw/xk9d2m
+
+# JSON body also works
+$ curl -s {{ .BaseURL }}/ \
+    -H 'Content-Type: application/json' \
+    -d '{"title":"hello","content":"world","language":"go"}'
+→ {{ .BaseURL }}/p/cd4e8w</code></pre>
+    </div>
+</section>
+
+<section>
+    <p class="section-label">Shell alias</p>
+    <div class="terminal-window">
+        <div class="terminal-bar">
+            <span class="tdot tdot-r"></span>
+            <span class="tdot tdot-y"></span>
+            <span class="tdot tdot-g"></span>
+        </div>
+        <pre><code># Add to ~/.bashrc or ~/.zshrc
+pb() { curl -sT - "{{ .BaseURL }}/$@"; }
+
+# Usage
+$ cat crash.log | pb
+→ {{ .BaseURL }}/p/xk9d2m
+
+$ cat secret.txt | pb '?once=1'
+→ {{ .BaseURL }}/p/zz9k1q
+   ⚠  burn after reading — deleted on first view
+
+$ cat deploy.sh | pb '?t=deploy&lang=bash&e=24h'
+→ {{ .BaseURL }}/p/ab3f7x</code></pre>
+    </div>
 </section>
 
 <section>
@@ -44,40 +149,58 @@ $ curl https://pipebin.dev/raw/xk9d2m</code></pre>
         </thead>
         <tbody>
             <tr>
-                <td><span class="method method-post">POST</span></td>
+                <td>
+                    <span class="method method-post">POST</span>
+                    <span class="method method-put">PUT</span>
+                </td>
                 <td><code>/</code></td>
-                <td>Create a new paste</td>
+                <td>Create paste — raw body, JSON, or form</td>
             </tr>
             <tr>
                 <td><span class="method method-get">GET</span></td>
                 <td><code>/p/{id}</code></td>
-                <td>View paste — HTML in browser, plain text via curl</td>
+                <td>View paste in browser</td>
             </tr>
             <tr>
                 <td><span class="method method-get">GET</span></td>
                 <td><code>/raw/{id}</code></td>
-                <td>Raw plain text, always</td>
+                <td>Raw plain text</td>
             </tr>
         </tbody>
     </table>
+    <p class="api-params">
+        Query params for raw pipe:
+        <code>?t=title</code>
+        <code>?lang=go</code>
+        <code>?e=24h</code>
+        <span class="param-alias">or <code>?expires=24h</code></span>
+        <code>?once=1</code>
+        <span class="param-alias">burn after reading</span>
+    </p>
 </section>
 
-<section>
+<section class="features-section">
     <p class="section-label">Features</p>
     <ul class="features">
         <li>No login required</li>
-        <li>Large log support</li>
-        <li>Raw plain text output</li>
-        <li>Expiring pastes</li>
-        <li>curl-friendly API</li>
-        <li>Browser + curl aware</li>
-        <li>Fast and minimal</li>
+        <li>Pipe-friendly — raw, JSON, or form</li>
+        <li>Syntax highlighting with line numbers</li>
+        <li>Language auto-detection</li>
+        <li>Burn after reading (<code>?once=1</code>)</li>
+        <li>Expiring pastes (<code>?e=24h</code>)</li>
+        <li>Download button</li>
+        <li>curl-friendly plain text URL</li>
+        <li>Shell alias — one command to pipe</li>
+        <li>10 MB paste limit</li>
         <li>No JavaScript required</li>
+        <li>IP privacy (SHA-256 hashed)</li>
     </ul>
 </section>
 
 <footer class="site-footer">
-    pipebin.dev &mdash; minimal pastebin for developers
+    <span>pipebin.dev</span>
+    <span class="footer-sep">·</span>
+    <span>minimal pastebin for developers</span>
 </footer>
 
 {{ end }}

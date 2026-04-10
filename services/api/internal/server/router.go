@@ -7,18 +7,18 @@ import (
 )
 
 type Dependencies struct {
-	PasteHandler handler.PasteHandler
+	PasteHandler  handler.PasteHandler
+	HealthHandler handler.HealthHandler
 }
 
 type Middleware func(http.Handler) http.Handler
 
-func NewRouter(
-	deps Dependencies,
-) *http.ServeMux {
+func NewRouter(deps Dependencies) *http.ServeMux {
 	mux := http.NewServeMux()
 
-	// root endpoint (POST api.local.pipebin.dev)
+	mux.HandleFunc("GET /healthz", deps.HealthHandler.Health)
 	mux.HandleFunc("POST /", deps.PasteHandler.CreatePaste)
+	mux.HandleFunc("PUT /", deps.PasteHandler.CreatePaste) // curl -T - URL
 	mux.HandleFunc("GET /p/{public_id}", deps.PasteHandler.GetPasteByPublicID)
 
 	return mux

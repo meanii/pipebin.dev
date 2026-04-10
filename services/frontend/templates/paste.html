@@ -3,24 +3,55 @@
     <a href="/" class="back-link">← pipebin.dev</a>
 </nav>
 
+{{ if .BurnAfterReading }}
+<div class="burn-notice">
+    <span class="burn-icon">⚠</span>
+    <span>Burn after reading — this paste has been permanently deleted. You are the last person to see it.</span>
+</div>
+{{ end }}
+
 <div class="paste-header">
-    {{ if .PasteTitle }}
-    <h2 class="paste-title">{{ .PasteTitle }}</h2>
-    {{ end }}
+    <h1 class="paste-title">{{ .PasteTitle }}</h1>
     <div class="paste-meta">
         <span class="paste-id">{{ .PasteID }}</span>
         <span class="paste-meta-sep">·</span>
         <span>{{ .CreatedAt }}</span>
         {{ if .ExpiresAt }}
         <span class="paste-meta-sep">·</span>
-        <span>expires {{ .ExpiresAt }}</span>
+        <span class="paste-expires">expires {{ .ExpiresAt }}</span>
         {{ end }}
+        {{ if .BurnAfterReading }}
         <span class="paste-meta-sep">·</span>
-        <a href="/raw/{{ .PasteID }}">raw ↗</a>
+        <span class="paste-burn">burn after reading</span>
+        {{ end }}
     </div>
 </div>
 
-<div class="paste-content">
-    <pre><code>{{ .Content }}</code></pre>
+<div class="code-frame">
+    <div class="code-frame-header">
+        <div class="code-frame-meta">
+            <span class="lang-badge">{{ .Language }}</span>
+            {{ if .LineCount }}
+            <span class="code-meta-sep">·</span>
+            <span>{{ .LineCount }} lines</span>
+            {{ end }}
+            {{ if .SizeStr }}
+            <span class="code-meta-sep">·</span>
+            <span>{{ .SizeStr }}</span>
+            {{ end }}
+        </div>
+        <div class="code-frame-actions">
+            <a href="/raw/{{ .PasteID }}" class="code-frame-action">raw ↗</a>
+            <span class="code-meta-sep">·</span>
+            <a href="/raw/{{ .PasteID }}" download="{{ .DownloadName }}" class="code-frame-action">download ↓</a>
+        </div>
+    </div>
+    <div class="paste-content">
+        {{ if .HighlightedContent }}
+        <div class="highlight-wrap">{{ .HighlightedContent }}</div>
+        {{ else }}
+        <pre><code>{{ .Content }}</code></pre>
+        {{ end }}
+    </div>
 </div>
 {{ end }}

@@ -69,3 +69,6 @@ eclipse-*bin/
 
 # User-specific .bazelrc
 user.bazelrc
+
+.CLAUDE*
+.CLAUDE.md

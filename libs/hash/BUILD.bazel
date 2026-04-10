@@ -1,8 +1,14 @@
-load("@rules_go//go:def.bzl", "go_library")
+load("@rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "hash",
     srcs = ["sha256hash.go"],
     importpath = "github.com/meanii/pipebin.dev/libs/hash",
     visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "hash_test",
+    srcs = ["sha256hash_test.go"],
+    embed = [":hash"],
 )

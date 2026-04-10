@@ -1,8 +1,11 @@
-load("@rules_go//go:def.bzl", "go_library")
+load("@rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "handler",
-    srcs = ["pastes_handler.go"],
+    srcs = [
+        "health_handler.go",
+        "pastes_handler.go",
+    ],
     importpath = "github.com/meanii/pipebin.dev/services/api/handler",
     visibility = ["//visibility:public"],
     deps = [
@@ -11,6 +14,18 @@ go_library(
         "//services/api/internal/config",
         "//services/api/internal/httpx",
         "//services/api/internal/services",
-        "@com_github_go_playground_validator_v10//:validator",
+        "@com_github_go_ozzo_ozzo_validation_v4//:ozzo-validation",
+        "@com_github_jackc_pgx_v5//pgxpool",
+    ],
+)
+
+go_test(
+    name = "handler_test",
+    srcs = ["pastes_handler_test.go"],
+    embed = [":handler"],
+    deps = [
+        "//libs/models",
+        "//services/api/internal/config",
+        "//services/api/internal/services",
     ],
 )

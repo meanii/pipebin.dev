@@ -14,7 +14,6 @@ go_library(
         "//services/api/internal/server",
         "//services/api/internal/services",
         "//services/api/repository",
-        "@org_uber_go_zap//:zap",
     ],
 )
 

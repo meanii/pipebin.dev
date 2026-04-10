@@ -3,21 +3,38 @@
     <a href="/" class="back-link">← pipebin.dev</a>
 </nav>
 
-<div role="alert" data-variant="success">Paste created successfully.</div>
+<div class="result-header">
+    <p class="result-check">✓ paste created</p>
+    <h1 class="result-title">{{ if .PasteTitle }}{{ .PasteTitle }}{{ else }}paste{{ end }}</h1>
+    <div class="result-meta">
+        {{ if .Language }}<span class="lang-badge">{{ .Language }}</span>{{ end }}
+        {{ if .BurnAfterReading }}<span class="burn-badge">⚠ burn after reading</span>{{ end }}
+    </div>
+</div>
 
-<div class="url-result mt-4">
+{{ if .BurnAfterReading }}
+<div class="burn-notice">
+    <span class="burn-icon">⚠</span>
+    <span>This paste will be permanently deleted on first view. Share the URL carefully — it can only be read once.</span>
+</div>
+{{ end }}
+
+<div class="url-result">
     <div class="url-row">
         <span class="url-label">url</span>
-        <span class="url-value"><code>{{ .PasteURL }}</code></span>
+        <div class="url-value"><code>{{ .PasteURL }}</code></div>
         <a href="{{ .PasteURL }}" class="url-action">open ↗</a>
     </div>
     <div class="url-row">
         <span class="url-label">raw</span>
-        <span class="url-value"><code>{{ .RawURL }}</code></span>
+        <div class="url-value"><code>{{ .RawURL }}</code></div>
         <a href="{{ .RawURL }}" class="url-action">open ↗</a>
     </div>
 </div>
 
-<pre><code># Retrieve with curl
-$ curl {{ .RawURL }}</code></pre>
+<pre><code>$ curl -s {{ .RawURL }}</code></pre>
+
+<div class="result-footer">
+    <a href="/" class="back-link">← create another paste</a>
+</div>
 {{ end }}

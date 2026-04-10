@@ -10,16 +10,22 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// LoadDotEnv loads a .env file if it exists.
+// In container/production environments the file is absent and env vars
+// are injected directly — that is not an error.
 func LoadDotEnv(name, root string) {
 	cwd, err := os.Getwd()
 	if err != nil {
-		log.Fatal("Error failed to get CWD")
+		log.Fatal("failed to get working directory: ", err)
 	}
 
 	dotenvpath := path.Join(cwd, root, name)
-	err = godotenv.Load(dotenvpath)
-	if err != nil {
-		log.Fatal("Error loading .env file, ", dotenvpath)
+	if _, err = os.Stat(dotenvpath); os.IsNotExist(err) {
+		return // no .env file; rely on environment variables
+	}
+
+	if err = godotenv.Load(dotenvpath); err != nil {
+		log.Fatal("failed to load .env file: ", err)
 	}
 }
 

@@ -5,4 +5,9 @@ go_library(
     srcs = ["handlers.go"],
     importpath = "github.com/meanii/pipebin.dev/services/frontend/handlers",
     visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_alecthomas_chroma_v2//formatters/html",
+        "@com_github_alecthomas_chroma_v2//lexers",
+        "@com_github_alecthomas_chroma_v2//styles",
+    ],
 )

@@ -1,0 +1,12 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "migrations",
+    srcs = ["embed.go"],
+    embedsrcs = [
+        "000001_create_pastes_table.down.sql",
+        "000001_create_pastes_table.up.sql",
+    ],
+    importpath = "github.com/meanii/pipebin.dev/services/api/migrations",
+    visibility = ["//visibility:public"],
+)

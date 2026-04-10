@@ -1,43 +1,27 @@
 package logger
 
 import (
+	"log/slog"
 	"os"
-
-	"go.uber.org/zap"
 )
 
-var Log *zap.Logger
-
+// Setup configures the global slog default logger.
+// env="development" uses a human-readable text handler at DEBUG level.
+// Any other value uses a structured JSON handler at INFO level.
 func Setup(env string) {
-	var logger *zap.Logger
-	var err error
-
+	var handler slog.Handler
 	if env == "development" {
-		logger, err = zap.NewDevelopment()
+		handler = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+			Level: slog.LevelDebug,
+		})
 	} else {
-		logger, err = zap.NewProduction()
+		handler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+			Level: slog.LevelInfo,
+		})
 	}
-
-	if err != nil {
-		panic(err)
-	}
-
-	Log = logger
-	zap.ReplaceGlobals(logger)
+	slog.SetDefault(slog.New(handler))
 }
 
-func Sync() {
-	if Log != nil {
-		_ = Log.Sync()
-	}
-}
-
-func Env() string {
-	env := os.Getenv("ENV")
-
-	if env == "" {
-		env = "production"
-	}
-
-	return env
-}
+// Sync is a no-op kept for API compatibility.
+// slog writes synchronously; no flush is needed.
+func Sync() {}
